@@ -1,4 +1,7 @@
 import pytest
+from src.manager import Manager
+from src.models import Parameters
+from src.models import TenantSettlement
 
 from pydantic import ValidationError
 from src.models import Apartment, Tenant
@@ -84,3 +87,30 @@ def test_tenant_from_dict():
     with pytest.raises(ValidationError):
         data['rent_pln'] = "1500PLN" # Invalid field
         wrong_tenant = Tenant(**data)
+
+def test_tenant_settlements_creation():
+    parameters = Parameters()
+    manager = Manager(parameters)
+
+    apartment_settlement = manager.create_apartment_settlement('apart-polanka', 2025, 1)
+    tenant_settlements = manager.create_tenant_settlements(apartment_settlement)
+
+    assert len(tenant_settlements) == 2             
+    assert tenant_settlements[0].bills_pln == 455.0  
+    assert tenant_settlements[1].bills_pln == 455.0  
+    assert tenant_settlements[0].month == 1
+
+    original_tenants = manager.tenants
+    manager.tenants = {k: v for k, v in original_tenants.items() if k == 'tenant-1'}
+    settlement_1_tenant = manager.create_tenant_settlements(apartment_settlement)
+    assert len(settlement_1_tenant) == 1            
+    assert settlement_1_tenant[0].bills_pln == 910.0
+
+    manager.tenants = {} 
+    settlement_no_tenants = manager.create_tenant_settlements(apartment_settlement)
+    assert len(settlement_no_tenants) == 0          
+    assert isinstance(settlement_no_tenants, list)
+    manager.tenants = original_tenants
+    single_res = manager.create_tenant_settlements(apartment_settlement)[0]
+    assert isinstance(single_res, TenantSettlement) # Asercja 9
+    assert single_res.total_due_pln == single_res.rent_pln + single_res.bills_pln
