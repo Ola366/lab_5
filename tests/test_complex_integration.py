@@ -51,3 +51,8 @@ def test_apartment_costs_with_optional_parameters():
 
     costs = manager.get_apartment_costs('apart-polanka')
     assert costs == 3532.0
+
+
+        
+
+   

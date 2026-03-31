@@ -38,5 +38,7 @@ def test_apartment_costs():
  
     assert manager.get_apartment_costs('apart-polanka', 2025, 1) == 910.0
     assert manager.get_apartment_costs('apart-polanka', 2025, 2) == 0.0
-    assert manager.get_apartment_costs('polanka', 2025, 2) == 0.0
+    assert manager.get_apartment_costs('polanka', 2025, 2) == None
+
+
 
