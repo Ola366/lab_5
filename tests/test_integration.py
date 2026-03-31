@@ -1,7 +1,7 @@
 from src.models import Apartment
 from src.manager import Manager
 from src.models import Parameters
-
+from src.models import ApartmentSettlement
 
 def test_load_data():
     parameters = Parameters()
@@ -41,4 +41,19 @@ def test_apartment_costs():
     assert manager.get_apartment_costs('polanka', 2025, 2) == None
 
 
+def test_apartment_settlement_creation():
+    parameters = Parameters()
+    manager = Manager(parameters)
 
+    settlement = manager.create_apartment_settlement('apart-polanka', 2025, 1)
+    assert isinstance(settlement, ApartmentSettlement) 
+    assert settlement.apartment == 'apart-polanka'      
+    assert settlement.year == 2025                      
+    assert settlement.month == 1                       
+    assert settlement.total_bills_pln == 910.0          
+    assert settlement.total_due_pln == -910.0
+    settlement_empty = manager.create_apartment_settlement('apart-polanka', 2025, 2)
+    assert settlement_empty.total_bills_pln == 0.0      
+    assert settlement_empty.total_due_pln == 0.0        
+    assert settlement_empty.month == 2
+    assert manager.create_apartment_settlement('nie-istnieje', 2025, 1) is None
